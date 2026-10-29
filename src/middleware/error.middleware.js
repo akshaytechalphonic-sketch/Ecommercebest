@@ -73,8 +73,31 @@ const errorHandler = (err, req, res, next) => {
     return sendError(res, 'Token has expired', 'TOKEN_EXPIRED', [], 401);
   }
 
+  // Handle CORS Policy Errors
+  if (err.message && err.message.startsWith('CORS policy blocked')) {
+    console.warn(`[CORS Blocked] ${req.method} ${req.originalUrl} from origin: ${req.headers.origin || 'unknown'}`);
+    return sendError(res, err.message, 'CORS_ERROR', [], 403);
+  }
+
+  // Handle Sequelize Database Connection Errors
+  if (
+    err.name === 'SequelizeConnectionError' ||
+    err.name === 'SequelizeConnectionRefusedError' ||
+    err.name === 'SequelizeHostNotFoundError' ||
+    err.name === 'SequelizeAccessDeniedError'
+  ) {
+    console.error(`[Database Error] ${req.method} ${req.originalUrl} - ${err.message}`);
+    return sendError(
+      res,
+      'Database connection failed. Verify MySQL connection parameters on Render.',
+      'DATABASE_UNAVAILABLE',
+      [],
+      503
+    );
+  }
+
   // Default to 500 Internal Server Error
-  console.error('[Unhandled Error]:', err);
+  console.error(`[Unhandled Error] ${req.method} ${req.originalUrl} - ${err.name}: ${err.message}`);
   return sendError(
     res,
     'Internal server error',

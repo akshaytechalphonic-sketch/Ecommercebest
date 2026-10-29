@@ -34,13 +34,68 @@ const app = express();
 // Trust reverse proxy (Render, Heroku, Cloudflare) for secure cookies and protocol handling
 app.set('trust proxy', 1);
 
-// Disable Helmet CSP to allow Swagger UI scripts and styling to load seamlessly
+// Allowed Origins List (Live Swagger UI, Frontend dev servers, and Render domains)
+const allowedOrigins = [
+  'https://ecommercebest.onrender.com',
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5173',
+];
+
+if (process.env.FRONTEND_URL) {
+  process.env.FRONTEND_URL.split(',').forEach((url) => {
+    const trimmed = url.trim();
+    if (trimmed && !allowedOrigins.includes(trimmed)) allowedOrigins.push(trimmed);
+  });
+}
+
+if (process.env.CORS_ORIGIN) {
+  process.env.CORS_ORIGIN.split(',').forEach((url) => {
+    const trimmed = url.trim();
+    if (trimmed && !allowedOrigins.includes(trimmed)) allowedOrigins.push(trimmed);
+  });
+}
+
+const isOriginAllowed = (origin) => {
+  if (!origin) return true; // Server-to-server, curl, Postman, mobile native apps
+  if (allowedOrigins.includes(origin)) return true;
+  if (/^https?:\/\/localhost(:\d+)?$/.test(origin)) return true;
+  if (/^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)) return true;
+  if (/^https:\/\/.*\.onrender\.com$/.test(origin)) return true;
+  return false;
+};
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (isOriginAllowed(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS policy blocked access from origin: ${origin}`), false);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+  ],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  maxAge: 86400, // Cache preflight for 24h
+};
+
+// Configure Helmet with cross-origin resource policy enabled for API clients
 app.use(
-    helmet({
-        contentSecurityPolicy: false,
-    })
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  })
 );
-app.use(cors());
+
+// Register CORS middleware before all routes and Swagger
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Serve uploaded product files statically

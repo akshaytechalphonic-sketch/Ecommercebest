@@ -8,7 +8,9 @@ const HOST = "0.0.0.0";
 
 // Start Express server listening immediately on process.env.PORT and 0.0.0.0
 const server = app.listen(PORT, HOST, () => {
-    console.log(`Server running at http://${HOST}:${PORT}`);
+    console.log(`[Startup] Server listening on http://${HOST}:${PORT}`);
+    console.log(`[Startup] Swagger API Docs available at: http://${HOST}:${PORT}/api-docs/`);
+    console.log(`[Startup] Environment: ${process.env.NODE_ENV || 'development'}`);
 
     // Check database connectivity separately only after the application starts
     sequelize

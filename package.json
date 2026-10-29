@@ -9,6 +9,7 @@
     "client:build": "npm run build --prefix frontend",
     "migrate": "sequelize-cli db:migrate",
     "migrate:undo": "sequelize-cli db:migrate:undo",
+    "db:import": "node scripts/import_to_cloud.js",
     "test": "node tests/auth.test.js && node tests/user_address.test.js && node tests/vendor.test.js && node tests/category.test.js && node tests/product.test.js && node tests/product_search.test.js && node tests/cart.test.js && node tests/wishlist_admin_cart.test.js && node tests/inventory.test.js && node tests/banner_setting.test.js && node tests/commission_earnings.test.js"
   },
   "keywords": [],

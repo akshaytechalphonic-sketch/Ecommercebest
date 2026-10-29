@@ -15,8 +15,15 @@ const server = app.listen(PORT, HOST, () => {
     // Check database connectivity separately only after the application starts
     sequelize
         .authenticate()
-        .then(() => {
+        .then(async () => {
             console.log("MySQL connected successfully via Sequelize");
+            try {
+                // Automatically ensure all tables exist in the database
+                await sequelize.sync();
+                console.log("Database tables synchronized successfully.");
+            } catch (syncErr) {
+                console.error("Table sync notice:", syncErr.message);
+            }
         })
         .catch((error) => {
             console.error("Database connection notice:", error.message);

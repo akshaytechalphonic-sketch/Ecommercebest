@@ -3,6 +3,7 @@ require('dotenv').config();
 const env = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: Number(process.env.PORT || 5000),
+  DATABASE_URL: process.env.DATABASE_URL || process.env.MYSQL_URL || null,
   
   DB: {
     HOST: process.env.DB_HOST || 'localhost',
@@ -10,6 +11,7 @@ const env = {
     NAME: process.env.DB_NAME || 'multivendor_db',
     USER: process.env.DB_USER || 'root',
     PASSWORD: process.env.DB_PASSWORD || '',
+    SSL: process.env.DB_SSL === 'true' || Boolean(process.env.DATABASE_URL?.includes('ssl')),
   },
 
   JWT: {

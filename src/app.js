@@ -31,6 +31,9 @@ const { notFoundHandler, errorHandler } = require("./middleware/error.middleware
 
 const app = express();
 
+// Trust reverse proxy (Render, Heroku, Cloudflare) for secure cookies and protocol handling
+app.set('trust proxy', 1);
+
 // Disable Helmet CSP to allow Swagger UI scripts and styling to load seamlessly
 app.use(
     helmet({

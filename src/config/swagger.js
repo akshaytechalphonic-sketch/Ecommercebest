@@ -17,16 +17,16 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: process.env.APP_URL || process.env.RENDER_EXTERNAL_URL || 'https://ecommercebest.onrender.com',
-        description: 'Production Server (Live Render)',
-      },
-      {
         url: '/',
-        description: 'Current Origin (Relative)',
+        description: 'Current Server (Auto-detect Local / Live)',
       },
       {
         url: `http://localhost:${port}`,
         description: 'Local Development Server',
+      },
+      {
+        url: process.env.APP_URL || process.env.RENDER_EXTERNAL_URL || 'https://ecommercebest.onrender.com',
+        description: 'Production Server (Live Render)',
       },
     ],
     components: {

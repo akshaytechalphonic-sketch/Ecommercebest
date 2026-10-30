@@ -16,7 +16,7 @@ const server = app.listen(PORT, HOST, () => {
     sequelize
         .authenticate()
         .then(async () => {
-            console.log("MySQL connected successfully via Sequelize");
+            console.log(`Database (${sequelize.getDialect()}) connected successfully via Sequelize`);
             try {
                 // Automatically ensure all tables exist in the database
                 await sequelize.sync();

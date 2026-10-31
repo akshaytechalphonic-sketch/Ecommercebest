@@ -20,6 +20,8 @@ const PaymentModel = require('./payment.model');
 const CommissionModel = require('./commission.model');
 const SellerPayoutModel = require('./sellerPayout.model');
 const RefundModel = require('./refund.model');
+const HeaderMenuModel = require('./headerMenu.model');
+const HeaderMenuItemModel = require('./headerMenuItem.model');
 
 // Initialize models
 const User = UserModel(sequelize);
@@ -41,6 +43,8 @@ const Payment = PaymentModel(sequelize);
 const Commission = CommissionModel(sequelize);
 const SellerPayout = SellerPayoutModel(sequelize);
 const Refund = RefundModel(sequelize);
+const HeaderMenu = HeaderMenuModel(sequelize);
+const HeaderMenuItem = HeaderMenuItemModel(sequelize);
 
 // Model Associations
 User.hasMany(RefreshToken, {
@@ -369,6 +373,70 @@ Refund.belongsTo(Payment, {
   as: 'payment',
 });
 
+// Header Menu & Header Menu Item Associations
+HeaderMenu.hasMany(HeaderMenuItem, {
+  foreignKey: 'parent_menu_id',
+  as: 'items',
+  onDelete: 'CASCADE',
+});
+HeaderMenuItem.belongsTo(HeaderMenu, {
+  foreignKey: 'parent_menu_id',
+  as: 'menu',
+});
+
+// Nested Child Submenus
+HeaderMenuItem.hasMany(HeaderMenuItem, {
+  foreignKey: 'parent_id',
+  as: 'children',
+  onDelete: 'CASCADE',
+});
+HeaderMenuItem.belongsTo(HeaderMenuItem, {
+  foreignKey: 'parent_id',
+  as: 'parent',
+});
+
+// Header Menu and Banner Associations
+HeaderMenu.belongsTo(Banner, {
+  foreignKey: 'banner_id',
+  as: 'banner',
+  onDelete: 'SET NULL',
+});
+Banner.hasMany(HeaderMenu, {
+  foreignKey: 'banner_id',
+  as: 'headerMenus',
+});
+
+HeaderMenuItem.belongsTo(Banner, {
+  foreignKey: 'banner_id',
+  as: 'banner',
+  onDelete: 'SET NULL',
+});
+Banner.hasMany(HeaderMenuItem, {
+  foreignKey: 'banner_id',
+  as: 'headerMenuItems',
+});
+
+// Header Menu and Category Associations
+HeaderMenu.belongsTo(Category, {
+  foreignKey: 'category_id',
+  as: 'category',
+  onDelete: 'SET NULL',
+});
+Category.hasMany(HeaderMenu, {
+  foreignKey: 'category_id',
+  as: 'headerMenus',
+});
+
+HeaderMenuItem.belongsTo(Category, {
+  foreignKey: 'category_id',
+  as: 'category',
+  onDelete: 'SET NULL',
+});
+Category.hasMany(HeaderMenuItem, {
+  foreignKey: 'category_id',
+  as: 'headerMenuItems',
+});
+
 const db = {
   sequelize,
   Sequelize,
@@ -391,6 +459,8 @@ const db = {
   Commission,
   SellerPayout,
   Refund,
+  HeaderMenu,
+  HeaderMenuItem,
 };
 
 module.exports = db;

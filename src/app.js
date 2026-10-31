@@ -27,6 +27,9 @@ const orderRoutes = require("./routes/order.routes");
 const paymentRoutes = require("./routes/payment.routes");
 const commissionRoutes = require("./routes/commission.routes");
 const sellerPayoutRoutes = require("./routes/sellerPayout.routes");
+const adminHeaderMenuRoutes = require("./routes/admin.headerMenu.routes");
+const adminHeaderMenuItemRoutes = require("./routes/admin.headerMenuItem.routes");
+const storefrontHeaderMenuRoutes = require("./routes/storefront.headerMenu.routes");
 const { notFoundHandler, errorHandler } = require("./middleware/error.middleware");
 
 const app = express();
@@ -215,6 +218,12 @@ app.use("/api/v1/commissions", commissionRoutes);
 // Withdrawals & Seller Payouts routes
 app.use("/api/v1/payouts", sellerPayoutRoutes);
 app.use("/api/v1/withdrawals", sellerPayoutRoutes); // Helpful alias
+
+// Dynamic Header Menu & Storefront Navigation routes
+app.use("/api/v1/admin/header-menus", adminHeaderMenuRoutes);
+app.use("/api/v1/admin/header-menu-items", adminHeaderMenuItemRoutes);
+app.use("/api/v1/storefront/header-menu", storefrontHeaderMenuRoutes);
+app.use("/api/v1/storefront/header-menus", storefrontHeaderMenuRoutes); // Helpful alias
 
 // Catch-all 404 handler
 app.use(notFoundHandler);

@@ -32,9 +32,15 @@ const errorHandler = (err, req, res, next) => {
     return next(err);
   }
 
-  // Handle known AppError
-  if (err instanceof AppError) {
-    return sendError(res, err.message, err.code, err.errors, err.statusCode);
+  // Handle known AppError or errors with explicit statusCode
+  if (err instanceof AppError || err.statusCode) {
+    return sendError(
+      res,
+      err.message,
+      err.code || (err.statusCode === 404 ? 'NOT_FOUND' : err.statusCode === 409 ? 'CONFLICT' : 'ERROR'),
+      err.errors || [],
+      err.statusCode || 400
+    );
   }
 
   // Handle Zod Validation Errors

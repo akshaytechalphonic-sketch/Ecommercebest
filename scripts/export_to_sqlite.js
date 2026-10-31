@@ -26,6 +26,8 @@ const PaymentModel = require('../src/models/payment.model');
 const CommissionModel = require('../src/models/commission.model');
 const SellerPayoutModel = require('../src/models/sellerPayout.model');
 const RefundModel = require('../src/models/refund.model');
+const HeaderMenuModel = require('../src/models/headerMenu.model');
+const HeaderMenuItemModel = require('../src/models/headerMenuItem.model');
 
 const modelInitializers = [
   ['User', UserModel],
@@ -47,6 +49,8 @@ const modelInitializers = [
   ['Commission', CommissionModel],
   ['SellerPayout', SellerPayoutModel],
   ['Refund', RefundModel],
+  ['HeaderMenu', HeaderMenuModel],
+  ['HeaderMenuItem', HeaderMenuItemModel],
 ];
 
 async function exportMysqlToSqlite() {
@@ -127,3 +131,4 @@ exportMysqlToSqlite().catch((err) => {
   console.error('Export failed:', err);
   process.exit(1);
 });
+

@@ -421,6 +421,18 @@ const swaggerOptions = {
         description: 'Seller & Admin Stock Tracking, Atomic Adjustments, Low-Stock Alerts, and Audit Logs',
       },
       {
+        name: 'Admin Header Menus',
+        description: 'Administrator management of dynamic header menus, submenus, ordering, and banners',
+      },
+      {
+        name: 'Admin Header Menu Items',
+        description: 'Administrator management of nested submenu items and category/banner associations',
+      },
+      {
+        name: 'Storefront Navigation',
+        description: 'Public storefront dynamic header navigation with multi-level nested menus and banners',
+      },
+      {
         name: 'System',
         description: 'Health & Status Checks',
       },

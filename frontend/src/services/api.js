@@ -533,5 +533,59 @@ export const financialApi = {
     }),
 };
 
+export const headerMenuApi = {
+  // Public Storefront Navigation
+  getStorefrontHeaderMenu: () => request('/api/v1/storefront/header-menu', { method: 'GET' }),
+
+  // Admin Header Menus
+  getAdminHeaderMenus: () => request('/api/v1/admin/header-menus', { method: 'GET' }),
+  getHeaderMenuById: (id) => request(`/api/v1/admin/header-menus/${id}`, { method: 'GET' }),
+  createHeaderMenu: (payload) =>
+    request('/api/v1/admin/header-menus', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  updateHeaderMenu: (id, payload) =>
+    request(`/api/v1/admin/header-menus/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+  deleteHeaderMenu: (id) =>
+    request(`/api/v1/admin/header-menus/${id}`, {
+      method: 'DELETE',
+    }),
+  updateHeaderMenuStatus: (id, payload) =>
+    request(`/api/v1/admin/header-menus/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
+  reorderHeaderMenus: (items) =>
+    request('/api/v1/admin/header-menus/reorder', {
+      method: 'PATCH',
+      body: JSON.stringify(items),
+    }),
+
+  // Admin Submenu Items
+  createHeaderMenuItem: (menuId, payload) =>
+    request(`/api/v1/admin/header-menus/${menuId}/items`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  getHeaderMenuItems: (menuId) =>
+    request(`/api/v1/admin/header-menus/${menuId}/items`, {
+      method: 'GET',
+    }),
+  updateHeaderMenuItem: (itemId, payload) =>
+    request(`/api/v1/admin/header-menu-items/${itemId}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+  deleteHeaderMenuItem: (itemId) =>
+    request(`/api/v1/admin/header-menu-items/${itemId}`, {
+      method: 'DELETE',
+    }),
+};
+
+
 
 

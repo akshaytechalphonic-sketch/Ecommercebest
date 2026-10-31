@@ -62,6 +62,7 @@ import { BannerBrandingManager } from './BannerBrandingManager';
 import { FinancialManager } from './FinancialManager';
 import { ImageUploadInput } from './ImageUploadInput';
 import { ReportsManager } from './ReportsManager';
+import { HeaderMenuManager } from './HeaderMenuManager';
 
 export const ProfileDashboard = ({
   user,
@@ -540,6 +541,18 @@ export const ProfileDashboard = ({
 
               <button
                 type="button"
+                className={`bv-menu-btn ${activeTab === 'header-menus' ? 'active' : ''}`}
+                onClick={() => setActiveTab('header-menus')}
+                title="Dynamic Header Menus & Navigation Hub"
+              >
+                <div className="bv-menu-left">
+                  <Menu size={18} />
+                  <span>Header Menus</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
                 className="bv-menu-btn"
                 onClick={() => onToast?.('Broadcast notifications queue', 'info')}
               >
@@ -939,6 +952,18 @@ export const ProfileDashboard = ({
                 user={user}
                 onToast={onToast}
                 onBrandingUpdated={(updated) => setBranding(updated)}
+              />
+            </div>
+          )}
+
+          {/* ================================================================
+              TAB: DYNAMIC HEADER MENUS & NAVIGATION
+              ================================================================ */}
+          {activeTab === 'header-menus' && (
+            <div className="admin-view-fade">
+              <HeaderMenuManager
+                user={user}
+                onToast={onToast}
               />
             </div>
           )}

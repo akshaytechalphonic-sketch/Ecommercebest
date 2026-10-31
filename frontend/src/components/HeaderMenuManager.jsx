@@ -21,7 +21,7 @@ import {
   RefreshCw,
   Search,
 } from 'lucide-react';
-import { headerMenuApi, categoryApi, bannerApi } from '../services/api';
+import { headerMenuApi, categoryApi, bannerApi, adminBannerApi } from '../services/api';
 
 export const HeaderMenuManager = ({ user, onToast }) => {
   const [menus, setMenus] = useState([]);
@@ -67,10 +67,11 @@ export const HeaderMenuManager = ({ user, onToast }) => {
   const loadData = async () => {
     setLoading(true);
     try {
+      const getBannersFn = adminBannerApi?.getBanners || bannerApi?.getBanners;
       const [menuRes, catRes, banRes] = await Promise.allSettled([
         headerMenuApi.getAdminHeaderMenus(),
         categoryApi.adminGetCategories(),
-        bannerApi.getAdminBanners({ limit: 100 }),
+        getBannersFn ? getBannersFn({ limit: 100 }) : Promise.resolve({ data: [] }),
       ]);
 
       if (menuRes.status === 'fulfilled' && menuRes.value?.data) {
@@ -80,7 +81,8 @@ export const HeaderMenuManager = ({ user, onToast }) => {
         setCategories(Array.isArray(catRes.value.data) ? catRes.value.data : catRes.value.data?.categories || []);
       }
       if (banRes.status === 'fulfilled' && banRes.value?.data) {
-        setBanners(banRes.value.data?.banners || []);
+        const rawBanners = banRes.value.data?.banners || (Array.isArray(banRes.value.data) ? banRes.value.data : []);
+        setBanners(rawBanners);
       }
     } catch (err) {
       onToast?.(err.message || 'Failed to load menu data', 'error');
@@ -964,3 +966,4 @@ export const HeaderMenuManager = ({ user, onToast }) => {
     </div>
   );
 };
+

@@ -405,10 +405,20 @@ export const bannerApi = {
     request(`/api/v1/banners/${id}`, { method: 'GET' }),
   recordClick: (id) =>
     request(`/api/v1/banners/${id}/click`, { method: 'POST' }),
+  getAdminBanners: (params = {}) => {
+    const clean = Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined && v !== null && v !== ''));
+    const qs = new URLSearchParams(clean).toString();
+    return request(`/api/v1/admin/banners${qs ? `?${qs}` : ''}`, { method: 'GET' });
+  },
 };
 
 export const adminBannerApi = {
   getBanners: (params = {}) => {
+    const clean = Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined && v !== null && v !== ''));
+    const qs = new URLSearchParams(clean).toString();
+    return request(`/api/v1/admin/banners${qs ? `?${qs}` : ''}`, { method: 'GET' });
+  },
+  getAdminBanners: (params = {}) => {
     const clean = Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined && v !== null && v !== ''));
     const qs = new URLSearchParams(clean).toString();
     return request(`/api/v1/admin/banners${qs ? `?${qs}` : ''}`, { method: 'GET' });

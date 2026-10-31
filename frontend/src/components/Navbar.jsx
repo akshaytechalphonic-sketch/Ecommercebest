@@ -1,34 +1,55 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ShoppingBag, BookOpen, LogOut, User, Sun, Moon, ChevronDown, Sparkles } from 'lucide-react';
-import { headerMenuApi } from '../services/api';
+import { ShoppingBag, BookOpen, LogOut, User, Sun, Moon, ChevronDown, Sparkles, ArrowRight, Eye } from 'lucide-react';
+import { headerMenuApi, bannerApi } from '../services/api';
 
 export const Navbar = ({ user, onLogout, onNavigate, currentView, theme, onToggleTheme, branding }) => {
   const activeLogo = theme === 'dark' && branding?.site_dark_logo ? branding.site_dark_logo : branding?.site_logo;
 
   const [headerMenus, setHeaderMenus] = useState([]);
   const [hoveredMenuId, setHoveredMenuId] = useState(null);
+  const [selectedMenu, setSelectedMenu] = useState(null);
+  const [activeHeroBanner, setActiveHeroBanner] = useState(null);
   const hoverTimeoutRef = useRef(null);
 
+  // Load Storefront Header Menus
   useEffect(() => {
     headerMenuApi
       .getStorefrontHeaderMenu()
       .then((res) => {
-        if (res?.data && Array.isArray(res.data)) {
+        if (res?.data && Array.isArray(res.data) && res.data.length > 0) {
           setHeaderMenus(res.data);
+          // Set first menu (HOME & LIVING) as default active
+          setSelectedMenu(res.data[0]);
+          if (res.data[0]?.banner) {
+            setActiveHeroBanner(res.data[0].banner);
+          }
         }
       })
       .catch(() => {});
   }, []);
 
-  const handleMouseEnter = (menuId) => {
+  const handleMouseEnter = (menu) => {
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-    setHoveredMenuId(menuId);
+    setHoveredMenuId(menu.id);
   };
 
   const handleMouseLeave = () => {
     hoverTimeoutRef.current = setTimeout(() => {
       setHoveredMenuId(null);
-    }, 180);
+    }, 200);
+  };
+
+  const handleSelectMenu = (menu) => {
+    setSelectedMenu(menu);
+    if (menu.banner) {
+      setActiveHeroBanner(menu.banner);
+    }
+  };
+
+  const handleSelectSubmenu = (col) => {
+    if (col.banner) {
+      setActiveHeroBanner(col.banner);
+    }
   };
 
   const currentHoveredMenu = headerMenus.find((m) => m.id === hoveredMenuId);
@@ -177,11 +198,13 @@ export const Navbar = ({ user, onLogout, onNavigate, currentView, theme, onToggl
           <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', gap: '28px', overflowX: 'auto' }}>
             {headerMenus.map((menu) => {
               const isHovered = hoveredMenuId === menu.id;
+              const isSelected = selectedMenu?.id === menu.id;
 
               return (
                 <div
                   key={menu.id}
-                  onMouseEnter={() => handleMouseEnter(menu.id)}
+                  onClick={() => handleSelectMenu(menu)}
+                  onMouseEnter={() => handleMouseEnter(menu)}
                   onMouseLeave={handleMouseLeave}
                   style={{
                     position: 'relative',
@@ -198,7 +221,7 @@ export const Navbar = ({ user, onLogout, onNavigate, currentView, theme, onToggl
                       fontWeight: 700,
                       letterSpacing: '0.06em',
                       textTransform: 'uppercase',
-                      color: isHovered
+                      color: (isHovered || isSelected)
                         ? '#b45309' // Gold accent color from Image 3
                         : menu.slug === 'sale'
                         ? '#dc2626' // Red accent for SALE
@@ -209,7 +232,7 @@ export const Navbar = ({ user, onLogout, onNavigate, currentView, theme, onToggl
                     <span>{menu.name}</span>
                   </div>
 
-                  {/* Gold active underline bar on hover (just like in Image 3) */}
+                  {/* Gold active underline bar on hover & select (just like in Image 3) */}
                   <div
                     style={{
                       position: 'absolute',
@@ -219,7 +242,7 @@ export const Navbar = ({ user, onLogout, onNavigate, currentView, theme, onToggl
                       height: '3px',
                       background: menu.slug === 'sale' ? '#dc2626' : '#b45309',
                       borderRadius: '2px 2px 0 0',
-                      opacity: isHovered ? 1 : 0,
+                      opacity: (isHovered || isSelected) ? 1 : 0,
                       transition: 'opacity 0.2s ease',
                     }}
                   />
@@ -233,7 +256,7 @@ export const Navbar = ({ user, onLogout, onNavigate, currentView, theme, onToggl
               ========================================================================= */}
           {currentHoveredMenu && currentHoveredMenu.items && currentHoveredMenu.items.length > 0 && (
             <div
-              onMouseEnter={() => handleMouseEnter(currentHoveredMenu.id)}
+              onMouseEnter={() => handleMouseEnter(currentHoveredMenu)}
               onMouseLeave={handleMouseLeave}
               style={{
                 position: 'absolute',
@@ -242,7 +265,7 @@ export const Navbar = ({ user, onLogout, onNavigate, currentView, theme, onToggl
                 right: 0,
                 background: '#ffffff',
                 borderBottom: '1px solid #e2e8f0',
-                boxShadow: '0 20px 30px rgba(0, 0, 0, 0.08)',
+                boxShadow: '0 20px 30px rgba(0, 0, 0, 0.1)',
                 zIndex: 999,
                 animation: 'fadeIn 0.2s ease',
               }}
@@ -262,14 +285,16 @@ export const Navbar = ({ user, onLogout, onNavigate, currentView, theme, onToggl
                   <div key={col.id} style={{ display: 'flex', flexDirection: 'column' }}>
                     {/* Gold Category Title */}
                     <h4
+                      onClick={() => handleSelectSubmenu(col)}
                       style={{
                         margin: '0 0 16px 0',
                         fontSize: '15px',
                         fontWeight: 700,
                         color: '#b45309', // Warm gold / bronze from Image 3
                         letterSpacing: '0.02em',
-                        fontFamily: 'inherit',
+                        cursor: 'pointer',
                       }}
+                      title="Click to view category banner"
                     >
                       {col.name}
                     </h4>
@@ -283,6 +308,11 @@ export const Navbar = ({ user, onLogout, onNavigate, currentView, theme, onToggl
                             <a
                               key={child.id}
                               href={child.redirect_url || '#'}
+                              onClick={(e) => {
+                                if (col.banner) {
+                                  setActiveHeroBanner(col.banner);
+                                }
+                              }}
                               style={{
                                 color: isSale ? '#dc2626' : '#475569',
                                 fontSize: '14px',
@@ -309,7 +339,7 @@ export const Navbar = ({ user, onLogout, onNavigate, currentView, theme, onToggl
                   </div>
                 ))}
 
-                {/* Optional Promotional Banner inside Mega Menu */}
+                {/* Promotional Banner inside Mega Menu */}
                 {currentHoveredMenu.banner && (
                   <div style={{
                     borderLeft: '1px solid #f1f5f9',
@@ -318,12 +348,16 @@ export const Navbar = ({ user, onLogout, onNavigate, currentView, theme, onToggl
                     flexDirection: 'column',
                     justifyContent: 'center',
                   }}>
-                    <div style={{
-                      borderRadius: '12px',
-                      overflow: 'hidden',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                      background: '#f8fafc',
-                    }}>
+                    <div
+                      onClick={() => handleSelectMenu(currentHoveredMenu)}
+                      style={{
+                        borderRadius: '12px',
+                        overflow: 'hidden',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                        background: '#f8fafc',
+                        cursor: 'pointer',
+                      }}
+                    >
                       <img
                         src={currentHoveredMenu.banner.image_url}
                         alt={currentHoveredMenu.banner.title}
@@ -345,6 +379,89 @@ export const Navbar = ({ user, onLogout, onNavigate, currentView, theme, onToggl
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* =========================================================================
+          DYNAMIC STOREFRONT HERO BANNER (Changes dynamically on menu click!)
+          ========================================================================= */}
+      {currentView !== 'profile' && activeHeroBanner && (
+        <div style={{ position: 'relative', width: '100%', background: '#0f172a', overflow: 'hidden' }}>
+          <div style={{
+            position: 'relative',
+            maxWidth: '1440px',
+            margin: '0 auto',
+            minHeight: '320px',
+            display: 'flex',
+            alignItems: 'center',
+            padding: '40px 32px',
+          }}>
+            {/* Background Image with Gradient Overlay */}
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundImage: `url('${activeHeroBanner.image_url}')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                filter: 'brightness(0.65)',
+                transition: 'all 0.5s ease-in-out',
+              }}
+            />
+
+            {/* Banner Text Content */}
+            <div style={{ position: 'relative', zIndex: 1, maxWidth: '640px', color: '#ffffff' }}>
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '4px 12px',
+                borderRadius: '20px',
+                background: 'rgba(180, 83, 9, 0.85)',
+                color: '#ffffff',
+                fontSize: '12px',
+                fontWeight: 700,
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+                marginBottom: '12px',
+              }}>
+                <Sparkles size={14} />
+                <span>Featured Collection</span>
+              </div>
+
+              <h1 style={{
+                fontSize: '36px',
+                fontWeight: 900,
+                lineHeight: '1.2',
+                margin: '0 0 10px 0',
+                textShadow: '0 2px 10px rgba(0,0,0,0.5)',
+              }}>
+                {activeHeroBanner.title}
+              </h1>
+
+              {activeHeroBanner.subtitle && (
+                <p style={{
+                  fontSize: '18px',
+                  color: '#e2e8f0',
+                  margin: '0 0 20px 0',
+                  fontWeight: 500,
+                  textShadow: '0 1px 4px rgba(0,0,0,0.5)',
+                }}>
+                  {activeHeroBanner.subtitle}
+                </p>
+              )}
+
+              {selectedMenu && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#cbd5e1' }}>
+                  <span>Active Menu:</span>
+                  <span style={{ fontWeight: 700, color: '#fde68a' }}>{selectedMenu.name}</span>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </header>

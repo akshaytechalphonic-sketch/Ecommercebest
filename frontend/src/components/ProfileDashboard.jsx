@@ -72,6 +72,7 @@ export const ProfileDashboard = ({
   onToast,
   theme,
   onToggleTheme,
+  onNavigateToStore,
 }) => {
   const isAdmin = user?.role === 'admin';
   const isVendor = user?.role === 'vendor';
@@ -753,6 +754,32 @@ export const ProfileDashboard = ({
               </div>
 
               <div className="bv-topbar-right">
+                {onNavigateToStore && (
+                  <button
+                    type="button"
+                    onClick={onNavigateToStore}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '7px',
+                      padding: '7px 15px',
+                      background: 'linear-gradient(135deg, #b45309 0%, #78350f 100%)',
+                      color: '#ffffff',
+                      borderRadius: '8px',
+                      fontWeight: 700,
+                      fontSize: '12px',
+                      letterSpacing: '0.04em',
+                      border: 'none',
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 8px rgba(180, 83, 9, 0.35)',
+                    }}
+                    title="Open Live Storefront Preview (Dynamic Header Navigation & Banners)"
+                  >
+                    <ExternalLink size={14} />
+                    <span>View Storefront</span>
+                  </button>
+                )}
+
                 <button
                   type="button"
                   className="bv-top-icon-btn"

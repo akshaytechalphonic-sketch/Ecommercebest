@@ -75,11 +75,15 @@ export const HeaderMenuManager = ({ user, onToast }) => {
       ]);
 
       if (menuRes.status === 'fulfilled' && menuRes.value?.data) {
-        setMenus(menuRes.value.data);
+        const list = Array.isArray(menuRes.value.data) ? menuRes.value.data : menuRes.value.data?.menus || [];
+        setMenus(list);
         // Expand first menu by default for great UX
-        if (menuRes.value.data.length > 0 && Object.keys(expandedMenus).length === 0) {
-          setExpandedMenus({ [menuRes.value.data[0].id]: true });
+        if (list.length > 0 && Object.keys(expandedMenus).length === 0) {
+          setExpandedMenus({ [list[0].id]: true });
         }
+      } else if (menuRes.status === 'rejected') {
+        console.error('Error fetching admin header menus:', menuRes.reason);
+        onToast?.(menuRes.reason?.message || 'Failed to load header menus', 'error');
       }
       if (catRes.status === 'fulfilled' && catRes.value?.data) {
         setCategories(Array.isArray(catRes.value.data) ? catRes.value.data : catRes.value.data?.categories || []);

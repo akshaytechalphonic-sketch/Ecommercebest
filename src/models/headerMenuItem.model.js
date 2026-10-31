@@ -132,3 +132,4 @@ module.exports = (sequelize) => {
 
   return HeaderMenuItem;
 };
+

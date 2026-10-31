@@ -197,6 +197,7 @@ export function App() {
             setBranding(newB);
             applyThemeColors(newB);
           }}
+          onNavigateToStore={() => setCurrentView('storefront')}
         />
       ) : (
         <>
@@ -210,7 +211,51 @@ export function App() {
             branding={branding}
           />
         <main className="main-content">
-          <div className="auth-wrapper">
+          {currentView === 'storefront' ? (
+            <div style={{ maxWidth: '1200px', margin: '30px auto', padding: '0 24px', textAlign: 'center' }}>
+              {user?.role === 'admin' && (
+                <div style={{
+                  marginBottom: '24px',
+                  padding: '12px 20px',
+                  borderRadius: '10px',
+                  background: 'rgba(180, 83, 9, 0.1)',
+                  border: '1px solid rgba(180, 83, 9, 0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '12px',
+                }}>
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: '#b45309' }}>
+                    ⚡ Storefront Live Preview Active: Hover or click on the header menus above to switch dynamic hero banners and view mega submenus.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentView('profile')}
+                    style={{
+                      padding: '6px 14px',
+                      background: '#7c3aed',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontWeight: 600,
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    ⚙️ Back to Admin Panel
+                  </button>
+                </div>
+              )}
+              <h2 style={{ fontSize: '26px', fontWeight: 800, marginBottom: '8px', color: 'var(--text-main, #0f172a)' }}>
+                Curated Luxury Collections
+              </h2>
+              <p style={{ color: '#64748b', fontSize: '15px', maxWidth: '640px', margin: '0 auto 24px' }}>
+                Select any tab in the header navigation bar above (HOME & LIVING, WOMEN, MEN, KIDS, JEWELLERY, NEW IN, SALE) or hover to view nested sub-categories.
+              </p>
+            </div>
+          ) : (
+            <div className="auth-wrapper">
             <div className="tabs-nav">
               <button
                 type="button"
@@ -262,6 +307,7 @@ export function App() {
               />
             )}
           </div>
+          )}
         </main>
         </>
       )}

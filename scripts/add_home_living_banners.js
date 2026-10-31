@@ -135,3 +135,4 @@ addHomeLivingBanners().catch((err) => {
   console.error('Failed to add Home & Living banners:', err);
   process.exit(1);
 });
+
